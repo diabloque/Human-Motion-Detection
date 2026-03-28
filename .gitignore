@@ -1,0 +1,19 @@
+# Dataset images and labels (too large for git — download from Roboflow links in YAML files)
+datasets/*/images/
+datasets/*/labels/
+
+# Training outputs
+runs/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Zip archives
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
