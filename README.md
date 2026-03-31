@@ -1,38 +1,39 @@
 # Human Motion Detection
 
-An object-detection style project that detects human motion and objects in a room using YOLOv8 and computer vision techniques. Trained on multiple custom datasets including safety helmets, weapons, and people.
+Standalone YOLOv8 project for motion/object-style detection with custom datasets
+(helmet, weapon, and person+weapon classes).
 
 ## Overview
 
-- **Model:** YOLOv8n (Ultralytics)
-- **Datasets:** Safety helmets, weapons (guns/knives/grenades), person+weapon combinations
-- **Goal:** Detect and localise objects in images/video using YOLO-format annotated datasets
+- **Model family:** YOLOv8 (Ultralytics)
+- **Task:** object detection for room/scene monitoring
+- **Datasets:** custom YOLO-format datasets
+- **Entry scripts:** `train.py` and `predict.py`
 
 ## Project Structure
 
-```
+```text
 human-motion-detection/
 ├── datasets/
-│   ├── helmet_data.yaml    # Safety helmet dataset config (1 class: Helmets)
-│   ├── weapon_data.yaml    # Weapon dataset config (6 classes)
-│   └── wpn_data.yaml       # Person+weapon dataset config (2 classes)
-├── rename.py               # Utility to rename dataset images sequentially
+│   ├── helmet_data.yaml
+│   ├── weapon_data.yaml
+│   └── wpn_data.yaml
+├── results/
+│   ├── README.md
+│   └── sample_predictions/
+├── predict.py
+├── train.py
+├── rename.py
 ├── requirements.txt
 └── README.md
 ```
 
-## Dataset Download
+## Dataset Setup
 
-The image datasets are not included in this repo due to size.  
-Download them from Roboflow using the links in each YAML file:
+This repo excludes raw image/label datasets due to size. Download datasets from
+the links in YAML metadata and place them locally with this structure:
 
-| Dataset | Classes | Roboflow Link |
-|---------|---------|---------------|
-| Safety Helmet | `Helmets` | https://universe.roboflow.com/vincent-tay-2aion/safety-helmet-kurbz/dataset/3 |
-| Weapons | `Grenade, Gun, Knife, Pistol, handgun, rifle` | https://universe.roboflow.com/testing-kfsrv/guns-l4rap/dataset/3 |
-
-After downloading, place each dataset so the structure matches:
-```
+```text
 datasets/
 └── helmet/
     ├── images/
@@ -45,36 +46,81 @@ datasets/
         └── test/
 ```
 
-## Getting Started
+Do the same for `weapon` and `wpn` datasets.
 
-### 1. Install dependencies
+## Quickstart
+
+### 1) Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Train a model
+### 2) Train
+
+Helmet training (default):
+
 ```bash
-yolo detect train data=datasets/helmet_data.yaml model=yolov8n.pt epochs=50 imgsz=640
+python train.py --data datasets/helmet_data.yaml --epochs 50 --imgsz 640 --batch 8 --name helmet_50ep
 ```
 
-### 3. Run prediction on new images
+Weapon training:
+
 ```bash
-yolo detect predict model=runs/detect/train/weights/best.pt source=path/to/your/images save=True
+python train.py --data datasets/weapon_data.yaml --epochs 50 --imgsz 640 --batch 8 --name weapon_50ep
 ```
 
-### 4. Run prediction on webcam (live)
+### 3) Predict on folder/images/video
+
 ```bash
-yolo detect predict model=runs/detect/train/weights/best.pt source=0 show=True
+python predict.py --model runs/helmet_50ep/weights/best.pt --source path/to/images --name helmet_predict
 ```
 
-## Training Results
+### 4) Predict from webcam
 
-After 50 epochs on the helmet dataset, the model learns to detect safety helmets with improving mAP scores. Results are saved to `runs/detect/`.
+```bash
+python predict.py --model runs/helmet_50ep/weights/best.pt --source 0 --show --name webcam_predict
+```
 
-## Tech Stack
+## One-Command Demo Scripts
 
-- Python
-- Ultralytics YOLOv8
-- PyTorch
-- OpenCV
-- Roboflow datasets
+From repo root:
+
+### PowerShell (Windows)
+
+```powershell
+# Predict on sample images
+.\demo.ps1 -Mode predict -RunName demo_predict
+
+# Train a new run
+.\demo.ps1 -Mode train -RunName demo_train
+
+# Live webcam
+.\demo.ps1 -Mode webcam -Model "runs/helmet_50ep/weights/best.pt" -RunName demo_webcam
+```
+
+### Bash (Linux/macOS/Git Bash)
+
+```bash
+# Predict on sample images
+bash demo.sh predict
+
+# Train a new run
+bash demo.sh train
+
+# Live webcam
+bash demo.sh webcam
+```
+
+## Output Locations
+
+- Training outputs: `runs/<run_name>/`
+- Best weights: `runs/<run_name>/weights/best.pt`
+- Predictions: `runs/<predict_name>/`
+- Sample qualitative outputs committed in: `results/sample_predictions/`
+
+## Notes
+
+- `rename.py` is a helper script for bulk-renaming dataset files.
+- If you want to version `.pt` weights in GitHub, use Git LFS.
+- For better accuracy, train longer or use a larger model (`yolov8s.pt`, `yolov8m.pt`).
