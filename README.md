@@ -99,28 +99,9 @@ From repo root:
 .\demo.ps1 -Mode webcam -Model "runs/helmet_50ep/weights/best.pt" -RunName demo_webcam
 ```
 
-### Bash (Linux/macOS/Git Bash)
-
-```bash
-# Predict on sample images
-bash demo.sh predict
-
-# Train a new run
-bash demo.sh train
-
-# Live webcam
-bash demo.sh webcam
-```
-
 ## Output Locations
 
 - Training outputs: `runs/<run_name>/`
 - Best weights: `runs/<run_name>/weights/best.pt`
 - Predictions: `runs/<predict_name>/`
 - Sample qualitative outputs committed in: `results/sample_predictions/`
-
-## Notes
-
-- `rename.py` is a helper script for bulk-renaming dataset files.
-- If you want to version `.pt` weights in GitHub, use Git LFS.
-- For better accuracy, train longer or use a larger model (`yolov8s.pt`, `yolov8m.pt`).
